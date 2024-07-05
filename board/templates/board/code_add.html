@@ -1,0 +1,61 @@
+{% include "./base.html" %}
+<title>CODE 정보</title>
+
+{% block contents %}
+<div class="cd1">
+	<h1>코드 추가</h1>
+    <div class="content">
+		<form action="{% url 'board:code_add_exec' %}" method="post">
+		{% csrf_token %}
+
+		<div style="text-align:right;padding: 5px;">
+			<input class="my_btn" type="submit" value="저장">
+		</div>
+
+		<table class="board_for_read" border="1">
+			<tbody>
+				<tr>
+					<td class="td_title" style="text-align:center; width:20%;">TypeID</td>
+					<td style="padding:5px;">
+						<input type="text" name="CodeTypeID" id="CodeTypeID"/>
+					</td>
+				</tr>
+                <tr>
+					<td class="td_title" style="text-align:center; width:20%;">Type명</td>
+					<td style="padding:5px;">
+						<input type="text" name="CodeTypeName" id="CodeTypeName"/>
+					</td>
+				</tr>
+                <tr>
+					<td class="td_title" style="text-align:center; width:20%;">DataID</td>
+					<td style="padding:5px;">
+						<input type="text" name="CodeDataID" id="CodeDataID"/>
+					</td>
+				</tr>
+                <tr>
+					<td class="td_title" style="text-align:center; width:20%;">Data명</td>
+					<td style="padding:5px;">
+						<input type="text" name="CodeDataName" id="CodeDataName"/>
+					</td>
+				</tr>
+                <tr>
+					<td class="td_title" style="text-align:center; width:20%;">사용여부</td>
+					<td style="padding:5px;">
+						<select name="UseYN">
+							<option value="">선택하세요</option>
+							<option value="Y">Y</option>
+							<option value="N">N</option>
+						</select>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		</form>
+
+		<div style="text-align:left;padding:5px;">
+			<button class="my_btn"><a href="{% url 'board:code_index' %}">돌아가기</a></button>
+		</div>
+
+    </div>
+</div>
+{% endblock %}

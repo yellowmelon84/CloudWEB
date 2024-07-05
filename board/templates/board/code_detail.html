@@ -1,0 +1,103 @@
+{% include "./base.html" %}
+<title>CODE 정보</title>
+
+{% block contents %}
+<div class="cd1">
+    <h1>코드 상세</h1>
+    <div class="content">
+        <form action="{% url 'board:edit_code' Code.CodeID %}" method="post">
+            {% csrf_token %}
+
+            <div style="text-align:right;padding: 5px;">
+                <input type="submit" class="my_btn" value="코드변경">
+            </div>
+
+            <table class="board_for_read" border="1">
+                <tbody>
+                    <tr>
+                        <td class="td_title" style="text-align:center; width:20%;">CodeID</td>
+                        <td style="padding:5px;">
+                            <input type="text" name="CodeID" id="CodeID" value="{{ Code.CodeID }}" style="background-color:#EAEAEA" readonly/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td_title" style="text-align:center; width:20%;">TypeID</td>
+                        <td style="padding:5px;">
+                            <input type="text" name="CodeTypeID" id="CodeTypeID" value="{{ Code.CodeTypeID }}"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td_title" style="text-align:center; width:20%;">TypeName</td>
+                        <td style="padding:5px;">
+                            <input type="text" name="CodeTypeName" id="CodeTypeName" value="{{ Code.CodeTypeName }}"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td_title" style="text-align:center; width:20%;">DataID</td>
+                        <td style="padding:5px;">
+                            <input type="text" name="CodeDataID" id="CodeDataID" value="{{ Code.CodeDataID }}"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td_title" style="text-align:center; width:20%;">DataName</td>
+                        <td style="padding:5px;">
+                            <input type="text" name="CodeDataName" id="CodeDataName" value="{{ Code.CodeDataName }}"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td_title" style="text-align:center; width:20%;">사용</td>
+                        <td style="padding:5px;">
+                            <select name="UseYN">
+                                <option value="{{ Code.UseYN }}">{{ Code.UseYN }}</option>
+                                <option value="Y">Y</option>
+                                <option value="N">N</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td_title" style="text-align:center; width:20%;">생성일자</td>
+                        <td style="padding:5px;">
+                            <input type="text" name="Created_date" id="Created_date" value="{{ Code.Created_date|date:'Y-m-d H:i:s' }}" style="background-color:#EAEAEA"  readonly/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td_title" style="text-align:center; width:20%;">변경일자</td>
+                        <td style="padding:5px;">
+                            <input type="text" name="Modified_date" id="Modified_date" value="{{ Code.Modified_date|date:'Y-m-d H:i:s' }}" style="background-color:#EAEAEA" readonly/>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+
+		<div style="text-align:left;padding:5px;">
+            <button class="my_btn"><a href="{% url 'board:code_index' %}">돌아가기</a></button>
+            <button class="btn-open-modal">삭제</button>
+		</div>
+    </div>
+
+    <div class="modal">
+        <div class="modal_body">
+            <p>CODE를 삭제하시겠습니까?</p>
+            <br>
+            <button type="button" class="btn-delete-modal"><a href="{% url 'board:delete_code' Code.CodeID %}">삭제</a></button>
+            &nbsp;&nbsp;
+            <button type="button" class="btn-close-modal" id="close">닫기</button>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.querySelector('.modal');
+        const btnOpenModal=document.querySelector('.btn-open-modal');
+        const btnCloseModal=document.querySelector('.btn-close-modal');
+
+        btnOpenModal.addEventListener("click", ()=>{
+            modal.style.display="flex";
+        });
+        btnCloseModal.addEventListener("click", ()=>{
+            modal.style.display="none";
+        });
+        
+    </script>
+</div>
+{% endblock %}

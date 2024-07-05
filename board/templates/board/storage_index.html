@@ -1,0 +1,47 @@
+{% include "./base.html" %}
+<title>스토리지 정보</title>
+
+{% block contents %}
+<div class="cd1">
+    <h1>스토리지 정보</h1>
+    <div class="content">
+
+        {% if board_list %}
+        <table class="board">
+            <thead>
+                <tr class="header">
+                    <th style="width:2%;">ID</th>
+                    <th style="width:15%">스토리지명</th>
+                    <th style="width:5%">도입</th>
+                    <th style="width:15%">모델</th>
+                    <th style="width:10%">S/N</th>
+                    <th style="width:15%">기능</th>
+                    <th style="width:2%">SIZE</th>
+                    <th style="width:10%">EOS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in board_list %}
+                <tr class="{% if forloop.counter|divisibleby:2 %}even_bgcolor{% endif %} code_tr" style="cursor:pointer;">
+                    <td style="text-align:center;">{{ data.StorageID }}</td>
+                    <td style="text-align:center;">{{ data.StorageName }}</td>
+                    <td style="text-align:center;">{{ data.GenName }}</td>
+                    <td style="text-align:center;">{{ data.Model }}</td>
+                    <td style="text-align:center;">{{ data.SerialNumber }}</td>
+                    <td style="text-align:center;">{{ data.FuncType }}</td>
+                    <td style="text-align:center;">{{ data.Size }}</td>
+                    <td style="text-align:center;">{{ data.EOS_Date|date:'Y-m-d' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% else %}
+        <tr>
+            <td>등록된 호스트가 없습니다.</td>
+        </tr>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

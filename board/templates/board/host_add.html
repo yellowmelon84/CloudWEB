@@ -1,0 +1,116 @@
+{% include "./base.html" %}
+<title>HOST 정보</title>
+
+{% block contents %}
+<div class="cd1">
+	<h1>HOST 추가</h1>
+    <div class="content">
+		<form action="{% url 'board:host_add_exec' %}" method="post">
+		{% csrf_token %}
+
+		<div style="text-align:right;padding: 5px;">
+			<input class="my_btn" type="submit" value="저장">
+		</div>
+
+		<table class="board_for_read" border="1">
+			<tbody>
+				<tr>
+					<td class="td_title" style="text-align:center; width:20%;">HostName</td>
+					<td style="padding:5px;">
+						<input type="text" name="HostName" id="HostName"/>
+					</td>
+				</tr>
+                <tr>
+					<td class="td_title" style="text-align:center; width:20%;">Cluster</td>
+					<td style="padding:5px;">
+                    {% if cluster_list %}
+                        <select name="ClusterID">
+							<option value="">선택하세요</option>
+                            {% for cl in cluster_list %}
+							<option value="{{ cl.ClusterID }}">{{ cl.ClusterName }}</option>
+                            {% endfor %}
+						</select>
+                    {% else %}
+                        <p>클러스터 정보를 등록해야 선택가능합니다.</p>
+                    {% endif %}
+					</td>
+				</tr>
+                <tr>
+					<td class="td_title" style="text-align:center; width:20%;">도입차수</td>
+					<td style="padding:5px;">
+                    {% if gen_list %}
+                        <select name="Gen">
+							<option value="">선택하세요</option>
+                            {% for gen in gen_list %}
+							<option value="{{ gen.CodeDataID }}">{{ gen.CodeDataName }}</option>
+                            {% endfor %}
+						</select>
+                    {% else %}
+                        <p>도입차수 정보를 등록해야 선택가능합니다.</p>
+                    {% endif %}
+					</td>
+				</tr>
+                <tr>
+					<td class="td_title" style="text-align:center; width:20%;">Model</td>
+					<td style="padding:5px;">
+						<input type="text" name="Model" id="Model"/>
+					</td>
+				</tr>
+                <tr>
+					<td class="td_title" style="text-align:center; width:20%;">SerialNumber</td>
+					<td style="padding:5px;">
+						<input type="text" name="SerialNumber" id="SerialNumber"/>
+					</td>
+				</tr>
+                <tr>
+					<td class="td_title" style="text-align:center; width:20%;">CPU_Model</td>
+					<td style="padding:5px;">
+						<input type="text" name="CPU_Model" id="CPU_Model"/>
+					</td>
+				</tr>
+                <tr>
+					<td class="td_title" style="text-align:center; width:20%;">Core</td>
+					<td style="padding:5px;">
+						<input type="text" name="Core" id="Core"/>
+					</td>
+				</tr>
+                <tr>
+					<td class="td_title" style="text-align:center; width:20%;">Memory</td>
+					<td style="padding:5px;">
+						<input type="text" name="Memory" id="Memory"/>
+					</td>
+				</tr>
+                <tr>
+					<td class="td_title" style="text-align:center; width:20%;">vSANDISK</td>
+					<td style="padding:5px;">
+						<input type="text" name="vSANDISK" id="vSANDISK"/>
+					</td>
+				</tr>
+                <tr>
+					<td class="td_title" style="text-align:center; width:20%;">GPUMem</td>
+					<td style="padding:5px;">
+						<input type="text" name="GPUMem" id="GPUMem"/>
+					</td>
+				</tr>
+                <tr>
+                    <td class="td_title" style="text-align:center; width:20%;">EOS_Date</td>
+                    <td style="padding:5px;">
+                        <input type="date"
+                                id="EOS_Date"
+                                name = "EOS_Date"
+                                max="9999-12-31"
+                                min="2024-01-01"
+                                value="{{ today|date:'Y-m-d' }}">
+                    </td>
+                </tr>
+			</tbody>
+		</table>
+		</form>
+
+		<div style="text-align:left;padding:5px;">
+			<button class="my_btn"><a href="{% url 'board:host_index' %}">돌아가기</a></button>
+		</div>
+
+    </div>
+</div>
+{% endblock %}

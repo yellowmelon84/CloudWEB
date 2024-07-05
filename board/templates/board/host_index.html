@@ -1,0 +1,91 @@
+{% include "./base.html" %}
+<title>호스트 정보</title>
+
+{% block contents %}
+<div class="cd1">
+    <h1>호스트 정보</h1>
+    <div class="content">
+        <div style="text-align:right;padding: 5px;">
+            <button type="button" class="my_btn" onclick="location.href={% url 'board:host_add' %}">추가</button>
+            <button type="button" class="btn-upload">업로드</button>
+            <button type="button" class="my_btn">
+                <a href="{% url 'board:excel_export' 2 %}">다운로드</a>
+            </button>
+        
+        </div>
+        {% if board_list %}
+        <table class="board">
+            <thead>
+                <tr class="header">
+                    <th style="width:2%;">ID</th>
+                    <th style="width:15%">호스트명</th>
+                    <th style="width:15%">클러스터</th>
+                    <th style="width:5%">도입</th>
+                    <th style="width:15%">모델</th>
+                    <th style="width:10%">S/N</th>
+                    <th style="width:15%">CPU</th>
+                    <th style="width:2%">Core</th>
+                    <th style="width:2%">Memory</th>
+                    <th style="width:2%">vSAN</th>
+                    <th style="width:2%">GPU</th>
+                    <th style="width:10%">EOS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in board_list %}
+                <tr class="{% if forloop.counter|divisibleby:2 %}even_bgcolor{% endif %} code_tr" onClick=location.href="{% url 'board:host_detail' data.HostID %}" style="cursor:pointer;">
+                    <td style="text-align:center;">{{ data.HostID }}</td>
+                    <td style="text-align:center;">{{ data.HostName }}</td>
+                    <td style="text-align:center;">{{ data.ClusterName }}</td>
+                    <td style="text-align:center;">{{ data.GenName }}</td>
+                    <td style="text-align:center;">{{ data.Model }}</td>
+                    <td style="text-align:center;">{{ data.SerialNumber }}</td>
+                    <td style="text-align:center;">{{ data.CPU_Model }}</td>
+                    <td style="text-align:center;">{{ data.Core }}</td>
+                    <td style="text-align:center;">{{ data.Memory }}</td>
+                    <td style="text-align:center;">{{ data.vSANDISK }}</td>
+                    <td style="text-align:center;">{{ data.GPUMem }}</td>
+                    <td style="text-align:center;">{{ data.EOS_Date|date:'Y-m-d' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <tr>
+            <td>등록된 호스트가 없습니다.</td>
+        </tr>
+        {% endif %}
+
+        <div class="modal">
+            <div class="modal_body2">
+                <label for="id_import_file" style="font-size:25px">호스트 정보 Excel 데이터 업로드</label>
+                <br>
+                <p style="color:red">주의 : 기존 데이터에서 추가됩니다!</p>
+                <br>
+                <form action="{% url 'board:excel_import' 2 %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="file" name="excelFile" class="guess_format" accept=".xlsx;.xls">
+                    <input type="submit" class="default" value="등록">
+                </form>
+                <br>
+                <button type="button" class="btn-close-modal" id="close" style="ackground-color:skyblue;color:black;border:none;width: 70px;height:30px;">닫기</button>
+            </div>
+        </div>
+    
+        <script>
+            const modal = document.querySelector('.modal');
+            const btnOpenModal=document.querySelector('.btn-upload');
+            const btnCloseModal=document.querySelector('.btn-close-modal');
+    
+            btnOpenModal.addEventListener("click", ()=>{
+                modal.style.display="flex";
+            });
+            btnCloseModal.addEventListener("click", ()=>{
+                modal.style.display="none";
+            });
+            
+        </script>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<style type="text/css">
+    .content {
+        max-width:100%;
+        margin: auto;
+        padding:10px;
+    }
+
+    .reply_content {
+        text-align:right	
+    }
+
+    .reply_content .reply{
+        border-radius: 0.5em;
+        display: block;
+        margin: 4px;
+        padding: 3px 10px;
+    }
+
+    #title {
+        height: 32px;
+        width: 100%;
+        border-radius: 0.5em;
+        border: none;
+        font-family: inherit;
+        font-size: inherit;
+        background: none;
+    }
+
+    textarea {
+        width: 100%;
+        font-family: inherit;
+        font-size: 100%;
+        resize: none;
+        border-radius: 0.5em;
+        padding-block: 10px;
+        border: 0px;
+        background: none;
+    }
+
+    a {
+        text-decoration-line: none;
+    }
+
+    a:link {
+        color : black;
+        text-decoration: none;
+    }
+    a:visited {
+        color : black;
+        text-decoration: none;
+    }
+    a:hover {
+        color : black;
+        text-decoration: none;
+    }
+    a:active {
+        color : black;
+        text-decoration: none;
+    }
+
+    .modal{
+        position:absolute;
+        display:none;
+        
+        justify-content: center;
+        top:0;
+        left:0;
+
+        width:100%;
+        height:100%;
+
+        background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal_body{
+        position:absolute;
+        top:50%; 
+    
+        width:200px; 
+        height:100px;
+
+        padding:40px;  
+
+        text-align: center;
+
+        background-color: rgb(255,255,255); 
+        border-radius:10px;
+        box-shadow:0 2px 3px 0 rgba(34,36,38,0.15);
+
+        transform:translateY(-50%); 
+    }
+
+    .modal_body2{
+        position:absolute;
+        top:50%; 
+    
+        width:400px; 
+        height:200px;
+
+        padding:20px;  
+
+        text-align: center;
+
+        background-color: rgb(255,255,255); 
+        border-radius:10px;
+        box-shadow:0 2px 3px 0 rgba(34,36,38,0.15);
+
+        transform:translateY(-50%); 
+    }
+
+    #modal .close-area {
+        display: inline;
+        float: right;
+        padding-right: 10px;
+        cursor: pointer;
+        color: white;
+    }
+
+    .my_btn, .btn-upload, .btn-open-modal, .btn-close-modal, .btn-delete-modal{
+        background-color: skyblue;
+        color: black;
+        border: none;
+        
+        width: 70px;
+        height: 30px;
+    }
+
+    .my_btn:hover, .btn-upload:hover , .btn-open-modal:hover, .btn-close-modal:hover, .btn-delete-modal:hover{
+        background-color: #0080FF;
+        color: black;
+        border: none;
+        cursor:pointer;
+        
+        width: 70px;
+        height: 30px;
+    }
+
+     
+    .cd1 {
+        margin-left: 290px;
+        padding-top: 1vh;
+    }
+
+    thead {
+        background-color:#cecece;
+    }
+
+    .header {
+        text-align: center;
+    }
+
+    .board_for_read {
+        width: 100%;
+        background-color:#f1f1f1;
+    }
+
+    .board {
+        width: 100%
+    }
+
+    .even_bgcolor {
+        background-color:#e8efff;
+    }
+
+    .code_tr:hover {
+          background-color: #c5a0f2;
+    }
+    
+    .td_title {
+        background-color: #d8d8d8
+    }
+
+    /* 노멀라이즈 시작 */
+    body, ul, li {
+        margin: 0;
+        padding: 0;
+        list-style: none;   	    /* 해당 태그의 list-style을 none으로 하는 것으로 ●을 제거한다 */
+    }
+
+    a {
+        color: inherit;   	        /* 부모 엘리먼트의 값을 물려받는다 */
+        text-decoration: none;      /* 해당 태그의 text-decoration 속성을 none 값으로 하는 것으로 밑줄을 제거한다 */
+    }
+
+    /* 2차 이상의 메뉴를 숨기기 */
+    .side-bar > ul ul {
+        display: none;
+    }
+
+    /* 사이트의 높이를 5000px로 만들어 스크롤 생성 */
+    body {
+        height: 5000px;
+        background-color: #FFFFFF;
+    }
+
+    /* 사이드바의 너비와 높이를 변수를 통해 통제 */
+    :root {
+        --side-bar-width: 270px;
+        --side-bar-height: 100vh;
+    }
+
+    .side-bar {
+        position: fixed;                        /* 스크롤을 따라오도록 지정 */
+        background-color: black;
+        width: var(--side-bar-width);
+        min-height: var(--side-bar-height);     /* 사이드바의 높이를 전체 화면 높이의 100%로 지정 */
+        margin-top: 0vh;    /* 사이드바 위와 아래의 마진을 동일하게 지정 */
+    }
+
+    .subj {
+        display: block;
+        color: white;
+        background-color: #380B61;
+        font-size: 1.6rem;
+        font-weight: bold;
+        padding-top: 30px;
+        padding-bottom: 30px;
+        padding-left: 50px;    
+    }
+
+    /* 모든 메뉴의 a에 속성값 부여 */
+    .side-bar ul > li > a {
+        display: block;
+        color: white;
+        font-size: 1.4rem;
+        font-weight: bold;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        padding-left: 50px;
+    }
+
+    /* 자식의 position이 absolute일 때 자식을 영역 안에 가두어 준다 */
+    .side-bar > ul > li {
+        position: relative;
+    }
+
+    /* 모든 메뉴가 마우스 인식 시 반응 */
+    .side-bar ul > li:hover > a {
+        background-color: #555;
+        border-bottom: 1px solid #999;
+    }
+
+    /* 1차 메뉴의 항목이 마우스 인식 시에 2차 메뉴 등장 */
+    .side-bar > ul > li:hover > ul {
+        display: block;
+        position: absolute;
+        background-color: #888;
+        top: 0;         /* 2차 메뉴의 상단을 1차 메뉴의 상단에 고정 */
+        left: 100%;     /* 2차 메뉴를 1차 메뉴의 너비만큼 이동 */
+        width: 100%;    /* 1차 메뉴의 너비를 상속 */
+    }
+
+
+    </style>
+
+    <aside class="side-bar">
+        <section class="side-bar__icon-box">
+            <section class="side-bar__icon-1">
+            <div></div>
+            <div></div>
+            <div></div>
+            </section>
+        </section>
+        <ul>
+            <li>
+                <font class="subj">Cloud WEB</font>
+            </li>
+            <li>
+            <a class="home" href="{% url 'board:main' %}">Home</a>
+            </li>
+            <li>
+            <a href="#">현황</a>
+            <ul>
+                <li><a href="#">서버 현황</a></li>
+                <li><a href="#">스토리지 현황</a></li>
+            </ul>
+            </li>
+            <li>
+            <a href="#">관리</a>
+            <ul>
+                <li><a href="#">가상서버</a></li>
+                <li><a href="{% url 'board:cluster_index' %}">클러스터</a></li>
+                <li><a href="{% url 'board:host_index' %}">호스트</a></li>
+                <li><a href="#">데이터스토어</a></li>
+                <li><a href="{% url 'board:storage_index' %}">스토리지</a></li>
+                <li><a href="{% url 'board:code_index' %}">코드관리</a></li>
+            </ul>
+            </li>
+        </ul>
+    </aside>
+    
+    {% block contents %}
+
+    {% endblock %}
+
+    {% if messages %}
+    {% for message in messages %}
+    {% if message.tags %}
+    <script>
+        alert("{{ message.message }}")
+    </script>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+
+</html>

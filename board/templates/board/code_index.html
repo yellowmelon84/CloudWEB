@@ -1,0 +1,78 @@
+{% include "./base.html" %}
+<title>CODE 정보</title>
+
+{% block contents %}
+<div class="cd1">
+    <h1>코드 정보</h1>
+    <div class="content">
+        <div style="text-align:right;padding: 5px;">
+            <button type="button" class="my_btn" onclick="location.href={% url 'board:code_add' %}">추가</button>
+            <button type="button" class="btn-upload">업로드</button>
+            <button type="button" class="my_btn">
+                <a href="{% url 'board:excel_export' 0 %}">다운로드</a>
+            </button>
+        </div>
+        {% if board_list %}
+        <table class="board">
+            <thead>
+                <tr class="header">
+                    <th style="width:10%;">ID</th>
+                    <th style="width:10%">TYPE ID</th>
+                    <th style="width:25%">TYPE 명</th>
+                    <th style="width:10%">DATA ID</th>
+                    <th style="width:25%">DATA 명</th>
+                    <th style="width:10%">사용여부</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in board_list %}
+                <tr class="{% if forloop.counter|divisibleby:2 %}even_bgcolor{% endif %} code_tr" onClick=location.href="{% url 'board:code_detail' data.CodeID %}" style="cursor:pointer;">
+                    <td style="text-align:center;">{{ data.CodeID }}</td>
+                    <td style="text-align:center;">{{ data.CodeTypeID }}</td>
+                    <td style="text-align:center;">{{ data.CodeTypeName }}</td>
+                    <td style="text-align:center;">{{ data.CodeDataID }}</td>
+                    <td style="text-align:center;">{{ data.CodeDataName }}</td>
+                    <td style="text-align:center;">{{ data.UseYN }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <tr>
+            <td>등록된 코드가 없습니다.</td>
+        </tr>
+        {% endif %}
+
+
+        <div class="modal">
+            <div class="modal_body2">
+                <label for="id_import_file" style="font-size:25px">CODE 정보 Excel 데이터 업로드</label>
+                <br>
+                <p style="color:red">주의 : 기존 데이터에서 추가됩니다!</p>
+                <br>
+                <form action="{% url 'board:excel_import' 0 %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="file" name="excelFile" class="guess_format" accept=".xlsx;.xls">
+                    <input type="submit" class="default" value="등록">
+                </form>
+                <br>
+                <button type="button" class="btn-close-modal" id="close" style="ackground-color:skyblue;color:black;border:none;width: 70px;height:30px;">닫기</button>
+            </div>
+        </div>
+    
+        <script>
+            const modal = document.querySelector('.modal');
+            const btnOpenModal=document.querySelector('.btn-upload');
+            const btnCloseModal=document.querySelector('.btn-close-modal');
+    
+            btnOpenModal.addEventListener("click", ()=>{
+                modal.style.display="flex";
+            });
+            btnCloseModal.addEventListener("click", ()=>{
+                modal.style.display="none";
+            });
+            
+        </script>
+    </div>
+</div>
+{% endblock %}
