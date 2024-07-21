@@ -76,7 +76,7 @@ class Host(models.Model):
     Memory = models.IntegerField()
     vSANDISK = models.IntegerField(null=True, blank=True)
     GPUMem = models.IntegerField(null=True, blank=True)
-    EOS_Date = models.DateTimeField(null=True, blank=True)
+    EOS_Date = models.DateField(null=True, blank=True)
     Created_date = models.DateTimeField()
     Modified_date = models.DateTimeField(null=True, blank=True)
 
@@ -103,6 +103,6 @@ class Storage(models.Model):
     SerialNumber = models.CharField(max_length=100)
     FuncType = models.CharField(max_length=10)
     Size = models.IntegerField()
-    EOS_Date = models.DateTimeField(null=True, blank=True)
+    EOS_Date = models.DateField(null=True, blank=True)
     Created_date = models.DateTimeField()
     Modified_date = models.DateTimeField(null=True, blank=True)

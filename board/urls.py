@@ -26,8 +26,15 @@ urlpatterns = [
     path('host_add/host_add_exec', views.host_add_exec, name='host_add_exec'),
     path('host_index/<int:hostid>', views.host_detail, name='host_detail'),
     path('host_index/<int:hostid>/host_edit', views.host_edit, name='host_edit'),
+    path('host_index/<int:hostid>/delete_host', views.delete_host, name='delete_host'),
 
     path('storage_index/', views.storage_index, name='storage_index'),
+    path('storage_add/', views.storage_add, name='storage_add'),
+    path('storage_add/storage_add_exec', views.storage_add_exec, name='storage_add_exec'),
+    path('storage_index/<int:storageid>', views.storage_detail, name='storage_detail'),
+    path('storage_index/<int:storageid>/storage_edit', views.storage_edit, name='storage_edit'),
+    path('storage_index/<int:storageid>/delete_storage', views.delete_storage, name='delete_storage'),
+
 ]
 
 

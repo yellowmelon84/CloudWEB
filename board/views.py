@@ -3,7 +3,8 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.utils import timezone
 from django.urls import reverse
 from django.contrib import messages
-import datetime
+from django.utils.timezone import make_aware
+from datetime import datetime
 import xlwt
 import pandas as pd
 from openpyxl import Workbook, load_workbook
@@ -171,6 +172,14 @@ def host_edit(request, hostid):
 
     return redirect('/board/host_index/'+ str(hostid))
 
+# host 삭제 처리 (host_detail.html)
+def delete_host(request, hostid):
+    record = Host.objects.get(HostID=hostid)
+    record.delete()
+
+    return HttpResponseRedirect(reverse('board:host_index'))
+
+
 # Storage 페이지
 def storage_index(request):
     query = f'''select A.StorageID as 'StorageID', A.StorageName as 'StorageName'
@@ -185,13 +194,57 @@ def storage_index(request):
     all_Storages = Storage.objects.raw(query)
     return render(request, 'board/storage_index.html', {'title': 'Storage 정보', 'board_list':all_Storages})
 
+# storage 상세 페이지
+def storage_detail(request, storageid):
+    query = f'''select A.StorageID as 'StorageID', A.StorageName as 'StorageName'
+                     ,A.Gen as 'GenID' ,B.CodeDataName as 'GenName'
+                     ,A.Model as 'Model', A.SerialNumber as 'SerialNumber'
+                     ,A.FuncType as 'FuncType', A.Size as 'Size'
+                     ,A.EOS_Date as 'EOS_Date'
+                from board_storage A
+                left outer join (select * from board_codeoption where CodeTypeID = 'G01') B on A.Gen = B.CodeDataID 
+                where A.StorageID = {storageid}
+                order by A.StorageName
+            '''
+    storage = Storage.objects.raw(query)
+
+    all_gen = CodeOption.objects.filter(CodeTypeID='G01').only('CodeDataID', 'CodeDataName')
+
+    return render(request, 'board/storage_detail.html', {'storage':storage[0], 'gen_list': all_gen})
+
+# Storage 변경 처리 (storage_detail.html)
+def storage_edit(request, storageid):
+    Storage.objects.filter(StorageID=storageid).update(StorageName=request.POST['StorageName'], Gen=request.POST['Gen'], Model=request.POST['Model'], SerialNumber=request.POST['SerialNumber'], FuncType=request.POST['FuncType'], Size=request.POST['Size'], EOS_Date=nvl(request.POST['EOS_Date']), Modified_date=timezone.now())
+    messages.add_message(request, messages.INFO, '변경되었습니다.')
+
+    return redirect('/board/storage_index/'+ str(storageid))
+
+# Storage 추가
+def storage_add(request):
+    all_gen = CodeOption.objects.filter(CodeTypeID='G01').only('CodeDataID', 'CodeDataName')
+    today = timezone.now()
+    return render(request, 'board/storage_add.html', {'gen_list': all_gen, 'today': today})
+
+# Storage 추가 처리
+def storage_add_exec(request):
+    b = Storage(StorageName=request.POST['StorageName'], Gen=request.POST['Gen'], Model=request.POST['Model'], SerialNumber=request.POST['SerialNumber'], FuncType=request.POST['FuncType'], Size=request.POST['Size'], EOS_Date=request.POST['EOS_Date'], Created_date=timezone.now())
+    b.save()
+    return HttpResponseRedirect(reverse('board:storage_index'))
+
+# Storage 삭제 처리 (Storage_detail.html)
+def delete_storage(request, storageid):
+    record = Storage.objects.get(StorageID=storageid)
+    record.delete()
+    return HttpResponseRedirect(reverse('board:storage_index'))
+
+
 #### 공통 영역 ####
 
 # Excel 다운로드 / Pandas 사용
 def excel_export(request, typeid):
     response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
-    now = datetime.datetime.now()
+    now = datetime.now()
 
     # CODE 정보 처리
     if typeid == 0:             
@@ -246,7 +299,25 @@ def excel_export(request, typeid):
         rowsdics = [item.__dict__ for item in rows]
         for rowdic in rowsdics:
             rowdic["EOS_Date"] = rowdic["EOS_Date"].strftime('%Y-%m-%d')
+
+    # 스토리지 정보 처리
+    elif typeid == 3:
+        typename = "Storage"
+        col_names = ['StorageID', 'StorageName', 'Gen', 'Model', 'SerialNumber', 'FuncType', 'Size', 'EOS_Date']
+        query = f'''select A.StorageID as 'StorageID', A.StorageName as 'StorageName'
+                        ,B.CodeDataName as 'Gen'
+                        ,A.Model as 'Model', A.SerialNumber as 'SerialNumber'
+                        ,A.FuncType as 'FuncType', A.Size as 'Size'
+                        ,A.EOS_Date as 'EOS_Date'
+                    from board_storage A
+                    left outer join (select * from board_codeoption where CodeTypeID = 'G01') B on A.Gen = B.CodeDataID
+                    order by A.StorageName
+                '''
         
+        rows = Storage.objects.raw(query)
+        rowsdics = [item.__dict__ for item in rows]
+        for rowdic in rowsdics:
+            rowdic["EOS_Date"] = rowdic["EOS_Date"].strftime('%Y-%m-%d')
 
     else:
         messages.add_message(request, messages.ERROR, '정의되지 않았습니다.')
@@ -287,14 +358,21 @@ def excel_import(request, typeid):
 
         # 호스트 정보
         elif typeid == 2:
-            print("11111111")
             for row in rows.itertuples():
                 clusterid = Cluster.objects.filter(ClusterName=row[2]).only('ClusterID')
-                gen = CodeOption.objects.filter(CodeTypeID='G01', CodeDataName=row[3]).only('CodeDataID')
-                print("%s %s" % clusterid, gen)
-                b = Host(HostName=row[1], ClusterID=clusterid, Gen=gen, Model=row[4], SerialNumber=row[5], CPU_Model=row[6], Core=row[7], Memory=row[8], vSANDISK=nvl(row[9]), GPUMem=nvl(row[10]), EOS_Date=datetime.strptime(row[11], '%Y-%m-%d'), Modified_date=timezone.now())
+                genid = CodeOption.objects.filter(CodeTypeID='G01', CodeDataName=row[3]).only('CodeDataID')
+                b = Host(HostName=row[1], ClusterID=clusterid[0].ClusterID, Gen=genid[0].CodeDataID, Model=row[4], SerialNumber=row[5], CPU_Model=row[6], Core=row[7], Memory=row[8], vSANDISK=nvl(row[9]), GPUMem=nvl(row[10]), EOS_Date=datetime.strptime(row[11], '%Y-%m-%d'), Created_date=timezone.now())
                 b.save()
             url = 'board:host_index'
+
+        # 스토리지 정보
+        elif typeid == 3:
+            for row in rows.itertuples():
+                genid = CodeOption.objects.filter(CodeTypeID='G01', CodeDataName=row[2]).only('CodeDataID')
+                print(genid[0].CodeTypeID)
+                b = Storage(StorageName=row[1], Gen=genid[0].CodeDataID, Model=row[3], SerialNumber=row[4], FuncType=row[5], Size=row[6], EOS_Date=datetime.strptime(row[7], '%Y-%m-%d'), Created_date=timezone.now())
+                b.save()
+            url = 'board:storage_index'
 
         else:
             messages.add_message(request, messages.ERROR, '정의되지 않았습니다.')
@@ -302,7 +380,7 @@ def excel_import(request, typeid):
         return HttpResponseRedirect(reverse(url))
     
     except Exception as e:
-        messages.add_message(request, messages.ERROR, 'Data Upload Failed.')
+        messages.add_message(request, messages.ERROR, 'EXCEL 업로드를 실패하였습니다.')
         return HttpResponseRedirect(reverse('board:main'))  
 
 # 공백 처리
